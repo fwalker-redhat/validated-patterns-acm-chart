@@ -1,0 +1,25 @@
+{{- $useManagedServiceAccount := false }}
+{{- if .Values.acm.backup.enableAutomaticImport }}
+{{- $useManagedServiceAccount = true }}
+{{- end }}{{- /* .Values.acm.backup.enableAutomaticImport */}}
+{{- if and (.Capabilities.APIVersions.Has "cluster.open-cluster-management.io/v1beta1/BackupSchedule")
+  (and .Values.acm.backup.enabled .Values.acm.backup.schedule) }}
+{{- with .Values.acm.backup.schedule }}
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: BackupSchedule
+metadata:
+  name: acm-backup-schedule
+  namespace: open-cluster-management-backup
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  veleroSchedule: {{ .veleroSchedule | quote }}
+  {{- if .veleroTtl }}
+  veleroTtl: {{ .veleroTtl }}
+  {{- end }}{{- /* if .veleroTtl */}}
+  {{- if $useManagedServiceAccount }}
+  useManagedServiceAccount: true
+  {{- end }}{{- /* if $useManagedServiceAccount */}}
+{{- end }}{{- /* with .Values.acm.backup */}}
+{{- end }}{{- /* if and .Values.acm.backup.enabled .Values.acm.backup.schedule */}}

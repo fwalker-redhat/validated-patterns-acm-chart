@@ -63,7 +63,26 @@ acm:
   mce_operator:
     source: redhat-operators
     channel: null
-
+  # -- Used to control backup and restore of ACM
+  # @default -- Backup operator is not enabled
+  backup:
+    # -- Enable the backup operator.
+    # This will lead to OpenShift ADP operator being installed into the 
+    # open-cluster-management-backup if AWS Security Token Service (STS) has not been enabled
+    enabled: false
+    # -- Custom OADP subscription specification (Optional)
+    # @default -- Not configured and uses the correlated default OADP version linked to the ACM version
+    oadpSubscriptionSpec:
+    # -- Enables the managed service account component which allows auto-import
+    # of managed clusters during restores
+    enableAutomaticImport: false
+    # -- Configures a backupschedule (Optional)
+    # @default -- Create a schedule that runs every 2 hours with an expiration time of 120 hours
+    schedule:
+      # -- Cron schedule to perform backups
+      veleroSchedule: "0 */2 * * *"
+      # -- Expiration time for a scheduled backup resource (Optional)
+      veleroTtl: 120h
 
 # -- Default secretstore configuration variables
 # @default -- depends on the individual settings

@@ -10,4 +10,15 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
     installer.open-cluster-management.io/mce-subscription-spec: '{"source": "{{ default "redhat-operators" .Values.acm.mce_operator.source }}" {{- $channel }} }'
+    {{- if and .Values.acm.backup.enabled .Values.acm.backup.oadpSubscriptionSpec }}
+    installer.open-cluster-management.io/oadp-subscription-spec: {{ .Values.acm.backup.oadpSubscriptionSpec | squote }}
+    {{- end }}{{- /* if and .Values.acm.backup.enabled .Values.acm.backup.oadpSubscriptionSpec */}}
+{{- if .Values.acm.backup.enabled }}
+spec:
+  overrides:
+    components:
+      - enabled: true
+        name: cluster-backup
+{{- else }}
 spec: {}
+{{- end }}{{- /* if .Values.acm.backup.enabled */}}
